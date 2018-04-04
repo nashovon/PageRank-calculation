@@ -23,7 +23,7 @@ import static java.util.stream.Collectors.toMap;
 
 /**
  *
- * @author HABIBI
+ * @author SHOVON
  */
 public class PageRank {
 
@@ -47,8 +47,9 @@ public class PageRank {
         ///READING DATA FROM FILE
         double dampingfactor = 0.85;
 
-        for (int file_num = 0; file_num <= 39; file_num++) {
-
+        for (int file_num = 18260; file_num <= 18260; file_num++) {
+            
+//<editor-fold defaultstate="collapsed" desc="Initializations">
             graph.clear();
             rank.clear();
             source.clear();
@@ -58,10 +59,11 @@ public class PageRank {
             temp_rank.clear();
             indegree.clear();
             outdegree.clear();
+//</editor-fold>
 
-          
             System.out.println("Reading file " + file_num);
 
+ //<editor-fold defaultstate="collapsed" desc="File Read">           
             try {
 
                 FileInputStream fileInputStream = null;
@@ -78,51 +80,43 @@ public class PageRank {
                 readdata = new BufferedReader(inputStreamReader);
 
                 String temp = null;
-                
-          
 
                 while ((temp = readdata.readLine()) != null) {
 
-                    
                     String split[] = temp.split("\\t");
-                  
+
                     if (split.length == 4) {
-                        
+
                         String child = split[0];
                         String parent = split[1];
-                       
-                        
 
-                       // System.out.println(parent +"\n"+child);
+                        // System.out.println(parent +"\n"+child);
                         vertex.add(child);
                         vertex.add(parent);
 
                         source.add(parent);
                         destination.add(child);
                         depth.put(parent, Integer.parseInt(split[3]));
-                        
-                        //set anchor
-                        
-                        if(anchor.get(child)==null){
-                            anchor.put(child,split[2]);
-                        }
-                        
-                        //incoming count
-                        
-                        if(indegree.get(child)==null)
-                        {
-                            indegree.put(child,1);
-                        }
-                        else indegree.put(child,indegree.get(child)+1);
-                        
-                        if(outdegree.get(parent)==null)
-                        {
-                            outdegree.put(parent,1);
-                        }
-                        else outdegree.put(parent,outdegree.get(parent)+1);
-                            
-                        //graph create
 
+                        //set anchor
+                        if (anchor.get(child) == null) {
+                            anchor.put(child, split[2]);
+                        }
+
+                        //incoming count
+                        if (indegree.get(child) == null) {
+                            indegree.put(child, 1);
+                        } else {
+                            indegree.put(child, indegree.get(child) + 1);
+                        }
+
+                        if (outdegree.get(parent) == null) {
+                            outdegree.put(parent, 1);
+                        } else {
+                            outdegree.put(parent, outdegree.get(parent) + 1);
+                        }
+
+                        //graph create
                         ArrayList<String> atemp = new ArrayList<String>();
 
                         if (graph.get(parent) != null) {
@@ -137,9 +131,60 @@ public class PageRank {
 
                 System.out.println("Unable to open file.");
             }
+//</editor-fold>
 
-            ///INITIALIZE RANK
-            
+
+//<editor-fold defaultstate="collapsed" desc="Use of Hypothetical nodes">
+//            Iterator<String> hyp_node_iterator_1 = vertex.iterator();
+//
+//            while (hyp_node_iterator_1.hasNext()) {
+//
+//                String temp_1 = hyp_node_iterator_1.next();
+//
+//                if (graph.get(temp_1) == null) {
+//
+//                    Iterator<String> hyp_node_iterator_2 = vertex.iterator();
+//
+//                    while (hyp_node_iterator_2.hasNext()) {
+//
+//                        String temp_2 = hyp_node_iterator_2.next();
+//
+//                        source.add( temp_1);
+//                        destination.add( temp_2);
+//                        
+//                        //incoming + outgoing recount
+//                        if (indegree.get(temp_2) == null) {
+//                            indegree.put(temp_2, 1);
+//                        } else {
+//                            indegree.put(temp_2, indegree.get(temp_2) + 1);
+//                        }
+//
+//                        if (outdegree.get(temp_1) == null) {
+//                            outdegree.put(temp_1, 1);
+//                        } else {
+//                            outdegree.put(temp_1, outdegree.get(temp_1) + 1);
+//                        }
+//                        
+//                        //graph recreate
+//                        ArrayList<String> atemp = new ArrayList<String>();
+//
+//                        if (graph.get(temp_1) != null) {
+//                            atemp.addAll(graph.get(temp_1));
+//                        }
+//                        atemp.add(temp_2);
+//
+//                        graph.put(temp_1, atemp);
+//
+//                    }
+//
+//                }
+//
+//            }
+//</editor-fold>
+
+
+//<editor-fold defaultstate="collapsed" desc="INITIALIZE RANK">
+
             
             Iterator<String> node_iterator = vertex.iterator();
 
@@ -147,7 +192,7 @@ public class PageRank {
 
             while (node_iterator.hasNext()) {
 
-                String it = node_iterator.next();     
+                String it = node_iterator.next();
 
                 rank.put(it, 1.0);
 
@@ -157,11 +202,16 @@ public class PageRank {
                 temp_rank.put(A, 0.0);
 
             }
+            
+ //</editor-fold>           
 
-            for (int key = 0; key < source.size(); key++) {
+   
+ 
+ //<editor-fold defaultstate="collapsed" desc="Calculations">
+ 
+ for (int key = 0; key < source.size(); key++) {
 
-                if(graph.get(destination.get(key))==null) 
-                {
+                if (graph.get(destination.get(key)) == null) {
                     continue;
                 }
                 int x = graph.get(source.get(key)).size();
@@ -183,8 +233,12 @@ public class PageRank {
                 rank.put(key3, ((1 - dampingfactor) + (dampingfactor * rank.get(key3))));
 
             }
+            
+//</editor-fold>
 
-            //sorting values
+          
+//<editor-fold defaultstate="collapsed" desc="Sorting">
+            
             String part1 = "E:/data/test2/url_";
             String part2 = Integer.toString(file_num);
             String part3 = "/URL_DB/output.txt";
@@ -197,22 +251,29 @@ public class PageRank {
 
             sortedmap = rank.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
 
+ //</editor-fold>
+            
+            
+            
+ //<editor-fold defaultstate="collapsed" desc="Save Data">          
             for (String print : sortedmap.keySet()) {
-                
-                outputfile.print(print + "[" +anchor.get(print)+ "]"+ "---[" +depth.get(print)+ "]"+  " ----- [IN] "+indegree.get(print) +"  ----  [OUT] ");
-               
-                if(graph.get(print)!=null) outputfile.print(graph.get(print).size());
-                else outputfile.print("0");
-                
+
+                System.out.println(print + "[" + anchor.get(print) + "]" + "---[" + depth.get(print) + "]" + " ----- [IN] " + indegree.get(print) + "  ----  [OUT] ");
+
+                outputfile.print(print + "[" + anchor.get(print) + "]" + "---[" + depth.get(print) + "]" + " ----- [IN] " + indegree.get(print) + "  ----  [OUT] ");
+
+                if (graph.get(print) != null) {
+                    outputfile.print(graph.get(print).size());
+                } else {
+                    outputfile.print("0");
+                }
+
                 outputfile.println(" ---- [RANK]" + sortedmap.get(print));
-                
 
             }
             outputfile.close();
             
-            
-            
-            
+ //</editor-fold>           
 
         }
 
